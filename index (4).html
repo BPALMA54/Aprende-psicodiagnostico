@@ -1,0 +1,1738 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PsicoDiagnóstico · DSM-5 Trainer</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,600;1,300&display=swap');
+
+  :root {
+    --navy: #1A4E8F;
+    --navy-dark: #0f2e56;
+    --navy-light: #2563b0;
+    --green: #1d7d4a;
+    --green-light: #25a361;
+    --red: #c0392b;
+    --amber: #e67e22;
+    --bg: #f5f7fa;
+    --surface: #ffffff;
+    --border: #d4dde8;
+    --text: #1a1f2e;
+    --muted: #6b7c9a;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--navy-dark);
+    border-bottom: 3px solid var(--navy-light);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: #fff;
+    letter-spacing: 0.08em;
+  }
+  .logo span { color: #64b5f6; }
+  .student-badge {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: #90caf9;
+    background: rgba(100,181,246,0.12);
+    padding: 4px 10px;
+    border-radius: 3px;
+    border: 1px solid rgba(100,181,246,0.25);
+  }
+
+  /* ── IDENTITY SCREEN ── */
+  #identity-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--navy-dark) 0%, #1a3a6b 100%);
+  }
+  .id-card {
+    background: var(--surface);
+    border-radius: 8px;
+    padding: 48px 40px;
+    width: 420px;
+    max-width: 95vw;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .id-card h1 {
+    font-family: var(--mono);
+    font-size: 20px;
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+  .id-card p {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 32px;
+    font-style: italic;
+  }
+  .field-group { margin-bottom: 20px; }
+  .field-group label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+  .field-group input, .field-group select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 5px;
+    font-family: var(--sans);
+    font-size: 14px;
+    color: var(--text);
+    transition: border-color .2s;
+    background: #fff;
+  }
+  .field-group input:focus, .field-group select:focus {
+    outline: none;
+    border-color: var(--navy);
+  }
+  .btn-primary {
+    width: 100%;
+    padding: 12px;
+    background: var(--navy);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: background .2s;
+    margin-top: 8px;
+  }
+  .btn-primary:hover { background: var(--navy-light); }
+
+  /* ── MAIN APP ── */
+  #app { display: none; }
+
+  nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    position: sticky;
+    top: 60px;
+    z-index: 90;
+  }
+  .nav-tab {
+    padding: 14px 20px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all .2s;
+  }
+  .nav-tab:hover { color: var(--navy); }
+  .nav-tab.active {
+    color: var(--navy);
+    border-bottom-color: var(--navy);
+    background: #f0f4ff;
+  }
+
+  .section { display: none; padding: 32px 24px; max-width: 960px; margin: 0 auto; }
+  .section.active { display: block; }
+
+  /* ── APRENDER SECTION ── */
+  .section-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .section-heading {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--navy-dark);
+    margin-bottom: 24px;
+  }
+
+  .disorder-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .disorder-btn {
+    padding: 14px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    cursor: pointer;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    text-align: left;
+    transition: all .15s;
+  }
+  .disorder-btn:hover { border-color: var(--navy); color: var(--navy); background: #f0f4ff; }
+  .disorder-btn.selected { border-color: var(--navy); background: var(--navy); color: #fff; }
+  .disorder-btn .tag {
+    display: block;
+    font-size: 10px;
+    font-weight: 400;
+    margin-top: 2px;
+    opacity: .7;
+    font-family: var(--mono);
+  }
+
+  /* ── QUIZ CARD ── */
+  #quiz-area { display: none; }
+  .quiz-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .quiz-disorder-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--navy);
+    background: #e8f0ff;
+    padding: 4px 10px;
+    border-radius: 3px;
+  }
+  .quiz-progress {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .progress-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--navy);
+    border-radius: 2px;
+    transition: width .4s ease;
+  }
+
+  .quiz-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 28px;
+    margin-bottom: 16px;
+  }
+  .quiz-question {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--navy-dark);
+    margin-bottom: 20px;
+  }
+  .quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .option-btn {
+    padding: 12px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    background: #fff;
+    cursor: pointer;
+    font-family: var(--sans);
+    font-size: 13px;
+    text-align: left;
+    transition: all .15s;
+    line-height: 1.4;
+  }
+  .option-btn:hover:not(:disabled) { border-color: var(--navy); background: #f0f4ff; }
+  .option-btn.correct { border-color: var(--green); background: #e8f8ef; color: var(--green); font-weight: 600; }
+  .option-btn.wrong { border-color: var(--red); background: #fde8e6; color: var(--red); }
+  .option-btn.reveal { border-color: var(--green); background: #e8f8ef; }
+  .option-btn:disabled { cursor: default; }
+
+  .feedback-box {
+    margin-top: 16px;
+    padding: 14px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    line-height: 1.5;
+    display: none;
+  }
+  .feedback-box.correct { background: #e8f8ef; border: 1px solid #a3d9b8; color: var(--green); }
+  .feedback-box.wrong { background: #fde8e6; border: 1px solid #f5b7b1; color: var(--red); }
+
+  .btn-next {
+    margin-top: 16px;
+    padding: 10px 24px;
+    background: var(--navy);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: none;
+    transition: background .2s;
+  }
+  .btn-next:hover { background: var(--navy-light); }
+
+  /* mastery indicator */
+  .mastery-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+    font-size: 12px;
+  }
+  .mastery-label { color: var(--muted); min-width: 180px; }
+  .mastery-dots { display: flex; gap: 4px; }
+  .dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--border);
+  }
+  .dot.filled { background: var(--navy); }
+  .dot.gold { background: #f0b429; }
+
+  .round-result {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 32px;
+    text-align: center;
+    display: none;
+  }
+  .round-result h2 { font-size: 22px; color: var(--navy-dark); margin-bottom: 8px; }
+  .round-result p { color: var(--muted); font-size: 13px; margin-bottom: 24px; }
+  .score-big { font-family: var(--mono); font-size: 48px; font-weight: 600; color: var(--navy); }
+  .score-sub { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+
+  /* ── CASOS SECTION ── */
+  .cases-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .case-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all .15s;
+    position: relative;
+  }
+  .case-card:hover { border-color: var(--navy); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(26,78,143,0.1); }
+  .case-card.solved { border-color: var(--green); }
+  .case-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .case-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--navy-dark);
+    margin-bottom: 6px;
+  }
+  .case-snippet {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .case-difficulty {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 2px;
+  }
+  .diff-medium { background: #fff3cd; color: #856404; }
+  .diff-hard { background: #fde8e6; color: #7b1d12; }
+  .diff-expert { background: #2d1b69; color: #c4b5fd; }
+
+  /* ── CASE DETAIL ── */
+  #case-detail { display: none; }
+  .case-back {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--navy);
+    cursor: pointer;
+    margin-bottom: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .case-back:hover { text-decoration: underline; }
+
+  .vignette-box {
+    background: var(--surface);
+    border-left: 4px solid var(--navy);
+    padding: 20px 24px;
+    border-radius: 0 6px 6px 0;
+    margin-bottom: 20px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text);
+  }
+
+  .data-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  @media(max-width:600px){ .data-grid { grid-template-columns: 1fr; } }
+  .data-box {
+    background: #f8faff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px;
+  }
+  .data-box h4 {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--navy);
+    margin-bottom: 8px;
+  }
+  .data-box ul { padding-left: 16px; }
+  .data-box li { font-size: 12px; color: var(--text); margin-bottom: 4px; line-height: 1.4; }
+
+  .diagnosis-area {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .diagnosis-area h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--navy-dark);
+    margin-bottom: 16px;
+  }
+  .diag-options { display: flex; flex-direction: column; gap: 8px; }
+  .diag-opt {
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all .15s;
+    background: #fff;
+  }
+  .diag-opt:hover:not(:disabled) { border-color: var(--navy); background: #f0f4ff; }
+  .diag-opt.selected { border-color: var(--navy); background: #e8f0ff; font-weight: 600; color: var(--navy); }
+  .diag-opt.correct { border-color: var(--green); background: #e8f8ef; color: var(--green); font-weight: 600; }
+  .diag-opt.wrong { border-color: var(--red); background: #fde8e6; color: var(--red); }
+  .diag-opt.reveal-ans { border-color: var(--green); background: #e8f8ef; }
+  .diag-opt:disabled { cursor: default; }
+
+  .justification-area {
+    margin-top: 16px;
+  }
+  .justification-area label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--navy);
+    display: block;
+    margin-bottom: 6px;
+  }
+  .justification-area textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 5px;
+    font-family: var(--sans);
+    font-size: 13px;
+    resize: vertical;
+    min-height: 90px;
+    transition: border-color .2s;
+  }
+  .justification-area textarea:focus { outline: none; border-color: var(--navy); }
+
+  .btn-submit-case {
+    padding: 11px 28px;
+    background: var(--navy);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .2s;
+    margin-top: 12px;
+  }
+  .btn-submit-case:hover { background: var(--navy-light); }
+
+  .case-result-box {
+    margin-top: 16px;
+    padding: 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    line-height: 1.6;
+    display: none;
+  }
+  .case-result-box.correct { background: #e8f8ef; border: 1px solid #a3d9b8; }
+  .case-result-box.wrong { background: #fde8e6; border: 1px solid #f5b7b1; }
+  .case-result-box h4 { font-weight: 600; margin-bottom: 6px; }
+
+  /* ── MI PROGRESO ── */
+  .progress-section { background: var(--surface); border: 1.5px solid var(--border); border-radius: 8px; padding: 24px; margin-bottom: 16px; }
+  .progress-section h3 { font-size: 14px; font-weight: 600; color: var(--navy-dark); margin-bottom: 16px; }
+  .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f0f4ff; }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-label { font-size: 13px; color: var(--text); }
+  .stat-val { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--navy); }
+
+  /* toast */
+  #toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--navy-dark); color: #fff;
+    padding: 12px 20px; border-radius: 6px;
+    font-size: 13px; font-family: var(--mono);
+    opacity: 0; transition: opacity .3s; pointer-events: none;
+    z-index: 999;
+  }
+  #toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<!-- IDENTITY SCREEN -->
+<div id="identity-screen">
+  <div class="id-card">
+    <h1>PsicoDiagnóstico</h1>
+    <p>DSM-5 Trainer · UPS Guayaquil</p>
+    <div class="field-group">
+      <label>Nombre completo</label>
+      <input type="text" id="inp-nombre" placeholder="Ej: Ana Lucia Torres Mora">
+    </div>
+    <div class="field-group">
+      <label>Paralelo</label>
+      <select id="inp-paralelo">
+        <option value="">Seleccionar...</option>
+        <option>A</option><option>B</option><option>C</option><option>D</option>
+      </select>
+    </div>
+    <button class="btn-primary" onclick="startApp()">Ingresar →</button>
+  </div>
+</div>
+
+<!-- HEADER + APP -->
+<header id="app-header" style="display:none;">
+  <div class="logo">Psico<span>Diagnóstico</span> · DSM-5</div>
+  <div class="student-badge" id="student-label">—</div>
+</header>
+
+<div id="app">
+  <nav>
+    <div class="nav-tab active" onclick="showSection('aprender')">📚 Aprender</div>
+    <div class="nav-tab" onclick="showSection('casos')">🔬 Casos Clínicos</div>
+    <div class="nav-tab" onclick="showSection('progreso')">📊 Mi Progreso</div>
+  </nav>
+
+  <!-- APRENDER -->
+  <div class="section active" id="s-aprender">
+    <div class="section-title">Módulo 01</div>
+    <div class="section-heading">Aprender Criterios DSM-5</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:20px;">Selecciona un diagnóstico y responde correctamente 3 veces consecutivas para dominarlo. El quiz no perdona errores fáciles.</p>
+
+    <div class="disorder-grid" id="disorder-grid"></div>
+
+    <div id="mastery-overview" style="margin-bottom:24px;"></div>
+
+    <div id="quiz-area">
+      <div class="quiz-header">
+        <div class="quiz-disorder-label" id="quiz-disorder-label">—</div>
+        <div class="quiz-progress" id="quiz-progress">0 / 0</div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+      <div class="quiz-card">
+        <div class="quiz-question" id="quiz-question">—</div>
+        <div class="quiz-options" id="quiz-options"></div>
+        <div class="feedback-box" id="quiz-feedback"></div>
+        <button class="btn-next" id="btn-next" onclick="nextQuestion()">Siguiente pregunta →</button>
+      </div>
+      <div class="round-result" id="round-result">
+        <div class="score-big" id="result-score">—</div>
+        <div class="score-sub" id="result-sub">—</div>
+        <h2 id="result-title" style="margin-top:12px;">—</h2>
+        <p id="result-msg">—</p>
+        <button class="btn-primary" style="max-width:200px;margin:0 auto;" onclick="restartQuiz()">Repetir →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CASOS -->
+  <div class="section" id="s-casos">
+    <div id="cases-list-view">
+      <div class="section-title">Módulo 02</div>
+      <div class="section-heading">Casos Clínicos</div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:24px;">Viñeta + entrevista + pruebas psicológicas. Justifica tu diagnóstico con los criterios DSM-5.</p>
+      <div class="cases-grid" id="cases-grid"></div>
+    </div>
+    <div id="case-detail">
+      <div class="case-back" onclick="backToCases()">← Volver a casos</div>
+      <div id="case-content"></div>
+    </div>
+  </div>
+
+  <!-- PROGRESO -->
+  <div class="section" id="s-progreso">
+    <div class="section-title">Módulo 03</div>
+    <div class="section-heading">Mi Progreso</div>
+    <div id="progress-content"></div>
+  </div>
+</div>
+
+<div id="toast">✓ Guardado</div>
+
+<script>
+// ════════════════════════════════════════════
+// CONFIG — REEMPLAZA con tu URL de Google Apps Script
+// ════════════════════════════════════════════
+const SHEET_URL = 'TU_URL_GOOGLE_APPS_SCRIPT_AQUI';
+
+let currentStudent = { nombre: '', paralelo: '' };
+let quizState = {};
+let mastery = {}; // { disorderKey: consecutiveCorrect }
+let caseResults = {}; // { caseId: { correct, justification } }
+
+// ════════════════════════════════════════════
+// DSM-5 QUESTION BANK
+// ════════════════════════════════════════════
+const DISORDERS = {
+  'TDAH-C': {
+    label: 'TDAH Combinado',
+    tag: 'Neurodesarrollo',
+    questions: [
+      {
+        q: '¿Cuántos síntomas de inatención se requieren para el diagnóstico de TDAH en menores de 17 años?',
+        opts: ['3 síntomas', '5 síntomas', '6 síntomas', '9 síntomas'],
+        ans: 2,
+        exp: 'El Criterio A1 exige ≥6 síntomas de inatención en menores de 17 años. En adultos (≥17 años) se requieren ≥5.'
+      },
+      {
+        q: '¿En cuántos contextos deben presentarse los síntomas del TDAH para cumplir criterio diagnóstico?',
+        opts: ['Solo en el hogar', 'Solo en la escuela', 'En al menos dos contextos diferentes', 'En tres o más contextos'],
+        ans: 2,
+        exp: 'Criterio C: los síntomas deben estar presentes en dos o más contextos (p. ej., hogar, escuela, trabajo).'
+      },
+      {
+        q: 'Un niño de 6 años presenta síntomas desde los 8 años. ¿Cumple el criterio de edad de inicio del TDAH?',
+        opts: ['Sí, cualquier edad vale', 'No, varios síntomas deben estar presentes antes de los 12 años', 'Sí, si son ≥6 síntomas', 'No, los síntomas deben aparecer antes de los 5 años'],
+        ans: 1,
+        exp: 'Criterio B: varios síntomas deben estar presentes antes de los 12 años de edad.'
+      },
+      {
+        q: '¿Cuál de los siguientes NO es un síntoma de hiperactividad/impulsividad del TDAH según DSM-5?',
+        opts: ['Interrumpe o se inmiscuye con otros', 'Se distrae fácilmente con estímulos irrelevantes', 'Corre o trepa en situaciones inapropiadas', 'Habla en exceso'],
+        ans: 1,
+        exp: 'Distraerse con estímulos irrelevantes es un síntoma de INATENCIÓN (Criterio A1), no de hiperactividad/impulsividad.'
+      },
+      {
+        q: 'Para diagnosticar TDAH Presentación Combinada, ¿qué debe cumplirse?',
+        opts: [
+          'Solo 6 síntomas de inatención',
+          'Solo 6 síntomas de hiperactividad/impulsividad',
+          '≥6 síntomas de inatención Y ≥6 síntomas de hiperactividad/impulsividad durante ≥6 meses',
+          '≥3 síntomas de cada dominio durante ≥3 meses'
+        ],
+        ans: 2,
+        exp: 'La presentación combinada requiere que se cumplan tanto el Criterio A1 (inatención) como el A2 (hiperactividad/impulsividad) durante al menos 6 meses.'
+      },
+      {
+        q: '¿Cuánto tiempo mínimo deben persistir los síntomas del TDAH para el diagnóstico?',
+        opts: ['3 meses', '6 meses', '12 meses', '2 años'],
+        ans: 1,
+        exp: 'Los síntomas deben persistir durante al menos 6 meses con una intensidad que interfiera con el funcionamiento (Criterio A).'
+      }
+    ]
+  },
+  'TDAH-D': {
+    label: 'TDAH Predominantemente Inatento',
+    tag: 'Neurodesarrollo',
+    questions: [
+      {
+        q: '¿Cuál es la diferencia diagnóstica principal entre TDAH Inatento y TDAH Combinado?',
+        opts: [
+          'En el inatento no hay síntomas antes de los 12 años',
+          'En el inatento se cumplen ≥6 síntomas de inatención pero NO se cumplen ≥6 de hiperactividad/impulsividad',
+          'En el inatento los síntomas duran menos de 6 meses',
+          'En el inatento solo se evalúa en el contexto escolar'
+        ],
+        ans: 1,
+        exp: 'La presentación predominantemente inatenta requiere cumplir A1 pero NO cumplir A2, a diferencia de la combinada.'
+      },
+      {
+        q: 'Un adulto de 25 años tiene 4 síntomas de inatención y 2 de hiperactividad. ¿Cumple criterios para TDAH Inatento?',
+        opts: [
+          'Sí, porque tiene más síntomas de inatención',
+          'No, en adultos se requieren ≥5 síntomas de inatención para el diagnóstico',
+          'Sí, si los síntomas interfieren en el trabajo',
+          'No, porque tiene síntomas mixtos'
+        ],
+        ans: 1,
+        exp: 'En adultos (≥17 años) se requieren ≥5 síntomas. Con 4 síntomas de inatención no se cumple el umbral.'
+      },
+      {
+        q: '¿Qué síntoma de inatención describe "no seguir instrucciones y no terminar tareas"?',
+        opts: [
+          'No prestar atención a detalles o cometer errores por descuido',
+          'Con frecuencia no sigue instrucciones y no logra terminar tareas',
+          'Con frecuencia pierde cosas necesarias para las actividades',
+          'Con frecuencia olvida las actividades cotidianas'
+        ],
+        ans: 1,
+        exp: 'Este es el criterio A1c del DSM-5: no sigue instrucciones y no logra terminar tareas (no por oposicionismo ni por incomprensión).'
+      }
+    ]
+  },
+  'TEA': {
+    label: 'Trastorno del Espectro Autista',
+    tag: 'Neurodesarrollo',
+    questions: [
+      {
+        q: 'El Criterio A del TEA exige déficits en comunicación social. ¿Cuántos de los 3 subdominios del Criterio A deben cumplirse?',
+        opts: ['Al menos 1 de 3', 'Al menos 2 de 3', 'Los 3 de 3 (todos)', 'Al menos 1 de 4'],
+        ans: 2,
+        exp: 'El Criterio A requiere que se cumplan los 3 subdominios: (1) reciprocidad socioemocional, (2) comunicación no verbal, y (3) relaciones.'
+      },
+      {
+        q: '¿Cuántos síntomas del Criterio B (comportamientos restringidos/repetitivos) se deben cumplir para el diagnóstico de TEA?',
+        opts: ['1 de 4', '2 de 4', '3 de 4', '4 de 4'],
+        ans: 1,
+        exp: 'El Criterio B requiere ≥2 de los 4 tipos de comportamientos restrictivos/repetitivos (estereotipias, insistencia en lo mismo, intereses restringidos, hiper/hiporeactividad sensorial).'
+      },
+      {
+        q: '¿Cuál es el Nivel de Apoyo 2 del TEA según DSM-5?',
+        opts: [
+          'Requiere apoyo muy notable',
+          'Requiere apoyo sustancial',
+          'Requiere apoyo',
+          'Independiente con ajustes razonables'
+        ],
+        ans: 1,
+        exp: 'Nivel 2 = "Requiere apoyo sustancial". Nivel 1 = apoyo. Nivel 3 = apoyo muy notable.'
+      },
+      {
+        q: 'Un niño de 4 años solo muestra síntomas del TEA en la escuela, no en casa. ¿Cumple el Criterio C del TEA?',
+        opts: [
+          'Sí, con un solo contexto es suficiente',
+          'No, los síntomas deben estar presentes en múltiples contextos',
+          'Sí si los síntomas son graves',
+          'Depende del nivel de apoyo asignado'
+        ],
+        ans: 1,
+        exp: 'Criterio C: los síntomas deben estar presentes en el período de desarrollo temprano y manifestarse en múltiples contextos.'
+      },
+      {
+        q: '¿Cuál de los siguientes NO corresponde al Criterio B del TEA (comportamientos restringidos/repetitivos)?',
+        opts: [
+          'Movimientos motores estereotipados o repetitivos',
+          'Insistencia en la monotonía y resistencia al cambio',
+          'Déficits en la reciprocidad socioemocional',
+          'Hiper o hiporreactividad sensorial'
+        ],
+        ans: 2,
+        exp: 'Los déficits en reciprocidad socioemocional pertenecen al Criterio A (comunicación social), no al Criterio B.'
+      },
+      {
+        q: 'El diagnóstico de TEA puede coexistir con:',
+        opts: [
+          'Trastorno de la comunicación social solo',
+          'TDAH, discapacidad intelectual y trastornos del lenguaje',
+          'Solo con discapacidad intelectual',
+          'Ningún otro diagnóstico de neurodesarrollo'
+        ],
+        ans: 1,
+        exp: 'El DSM-5 permite diagnósticos comórbidos de TDAH, discapacidad intelectual, trastornos del lenguaje y otros cuando los criterios de ambos se cumplen.'
+      }
+    ]
+  },
+  'DI': {
+    label: 'Discapacidad Intelectual',
+    tag: 'Neurodesarrollo',
+    questions: [
+      {
+        q: 'El diagnóstico de Discapacidad Intelectual requiere déficits en tres dominios. ¿Cuáles son?',
+        opts: [
+          'Cognitivo, motor y sensorial',
+          'Funcionamiento intelectual, funcionamiento adaptativo y en periodo del desarrollo',
+          'Cognitivo, social y laboral',
+          'Memoria, lenguaje y atención'
+        ],
+        ans: 1,
+        exp: 'Los tres criterios son: A) déficits en funciones intelectuales, B) déficits en comportamiento adaptativo, C) inicio en el período del desarrollo.'
+      },
+      {
+        q: 'Un CI de 62 con déficits adaptativos significativos en comunicación y cuidado personal. ¿Qué nivel de gravedad corresponde?',
+        opts: ['Leve (CI 50-55 a 70)', 'Moderado (CI 35-40 a 50-55)', 'Grave (CI 20-25 a 35-40)', 'Profundo (CI < 20-25)'],
+        ans: 0,
+        exp: 'El nivel leve generalmente corresponde a CI aproximado de 50-70. Sin embargo, el DSM-5 hace énfasis en la evaluación del funcionamiento adaptativo, no solo el CI.'
+      },
+      {
+        q: 'Según DSM-5, ¿cuál es el factor más importante para determinar la gravedad de la Discapacidad Intelectual?',
+        opts: [
+          'El coeficiente intelectual exclusivamente',
+          'El nivel de funcionamiento adaptativo en los dominios conceptual, social y práctico',
+          'La etiología del trastorno',
+          'La edad de inicio de los síntomas'
+        ],
+        ans: 1,
+        exp: 'El DSM-5 desplaza el énfasis del CI al funcionamiento adaptativo (dominios conceptual, social y práctico) como base para determinar la gravedad.'
+      },
+      {
+        q: '¿Hasta qué edad debe iniciarse la discapacidad intelectual para cumplir el Criterio C del DSM-5?',
+        opts: ['Antes de los 5 años', 'Durante el período del desarrollo (antes de los 18 años)', 'Antes de los 12 años', 'No hay límite de edad específico'],
+        ans: 1,
+        exp: 'El Criterio C establece que los déficits deben iniciarse durante el período del desarrollo, convencionalmente antes de los 18 años.'
+      }
+    ]
+  },
+  'TAG': {
+    label: 'Trastorno de Ansiedad Generalizada',
+    tag: 'Ansiedad',
+    questions: [
+      {
+        q: '¿Cuántos síntomas somáticos/cognitivos del TAG deben estar presentes en adultos (Criterio C)?',
+        opts: ['1 de 6', '2 de 6', '3 de 6', '4 de 6'],
+        ans: 2,
+        exp: 'Criterio C: presencia de ≥3 síntomas (en adultos). En niños basta con 1. Los síntomas incluyen: inquietud, fatiga, dificultad para concentrarse, irritabilidad, tensión muscular, problemas de sueño.'
+      },
+      {
+        q: '¿Cuánto tiempo deben persistir los síntomas del TAG?',
+        opts: ['Al menos 1 mes', 'Al menos 3 meses', 'Al menos 6 meses', 'Al menos 1 año'],
+        ans: 2,
+        exp: 'Criterio A: la ansiedad y preocupación excesiva deben ocurrir la mayor parte de los días durante al menos 6 meses.'
+      },
+      {
+        q: 'Un paciente con TAG presenta preocupación excesiva. ¿Qué característica especifica el DSM-5 sobre esta preocupación?',
+        opts: [
+          'Debe enfocarse en un único tema específico',
+          'Debe ser sobre una variedad de temas o actividades y difícil de controlar',
+          'Debe ir acompañada siempre de ataques de pánico',
+          'Debe ser desencadenada exclusivamente por eventos sociales'
+        ],
+        ans: 1,
+        exp: 'Criterio A: la preocupación es sobre varios temas (trabajo, salud, familia, etc.) y la persona tiene dificultad para controlarla (Criterio B).'
+      },
+      {
+        q: 'Un paciente toma una dosis alta de corticosteroides y desarrolla ansiedad generalizada. ¿Cuál sería el diagnóstico más apropiado?',
+        opts: [
+          'Trastorno de ansiedad generalizada',
+          'Trastorno de ansiedad inducido por sustancias/medicamentos',
+          'Trastorno de ansiedad debido a otra afección médica',
+          'Trastorno de pánico'
+        ],
+        ans: 1,
+        exp: 'Criterio F del TAG: los síntomas no deben ser atribuibles a efectos de sustancias o medicamentos. Los corticosteroides pueden inducir ansiedad → diagnóstico de trastorno inducido por sustancias.'
+      },
+      {
+        q: '¿Cuál síntoma NO pertenece al Criterio C del TAG?',
+        opts: [
+          'Tensión muscular',
+          'Despersonalización y desrealización',
+          'Problemas de sueño (dificultad para conciliar o mantener el sueño)',
+          'Fatigabilidad fácil'
+        ],
+        ans: 1,
+        exp: 'Despersonalización y desrealización son síntomas del trastorno de pánico o trastornos disociativos, no del Criterio C del TAG.'
+      }
+    ]
+  },
+  'TP-LIMIT': {
+    label: 'T. Límite de la Personalidad',
+    tag: 'Personalidad Clúster B',
+    questions: [
+      {
+        q: '¿Cuántos criterios del TLP deben cumplirse para el diagnóstico?',
+        opts: ['3 de 9', '5 de 9', '7 de 9', 'Todos los 9'],
+        ans: 1,
+        exp: 'Se requieren ≥5 de los 9 criterios diagnósticos del TLP (DSM-5, 301.83).'
+      },
+      {
+        q: '¿Cuál de los siguientes NO es un criterio diagnóstico del TLP?',
+        opts: [
+          'Inestabilidad afectiva debida a una reactividad notable del estado de ánimo',
+          'Grandiosidad y sentido exagerado de autoestima',
+          'Esfuerzos desesperados para evitar el abandono real o imaginado',
+          'Comportamientos, actos o amenazas suicidas recurrentes'
+        ],
+        ans: 1,
+        exp: 'La grandiosidad es un criterio del Trastorno Narcisista de la Personalidad, no del TLP. El TLP se caracteriza por inestabilidad, no inflación del ego.'
+      },
+      {
+        q: 'El "fenómeno de escisión" (splitting) en el TLP se refleja en qué criterio diagnóstico?',
+        opts: [
+          'Impulsividad en al menos dos áreas potencialmente dañinas',
+          'Patrón de relaciones interpersonales inestables e intensas caracterizado por la alternancia entre idealización y devaluación',
+          'Sentimientos crónicos de vacío',
+          'Comportamientos autolesivos recurrentes'
+        ],
+        ans: 1,
+        exp: 'El Criterio 2 del TLP (relaciones inestables con alternancia idealización/devaluación) refleja el splitting: ver a las personas como totalmente buenas o totalmente malas.'
+      },
+      {
+        q: '¿Qué diferencia el TLP del Trastorno Bipolar en términos de la duración de los cambios de humor?',
+        opts: [
+          'En el TLP los cambios duran semanas a meses; en el Bipolar duran horas',
+          'En el TLP los cambios de humor son rápidos (horas a días); en el Bipolar duran días a semanas',
+          'No hay diferencia, son el mismo diagnóstico',
+          'El TLP tiene ánimo elevado sostenido; el Bipolar solo tiene depresión'
+        ],
+        ans: 1,
+        exp: 'La inestabilidad afectiva del TLP (Criterio 6) es reactiva y dura horas o a lo sumo días. Los episodios del Trastorno Bipolar duran días a semanas con patrón más sostenido.'
+      }
+    ]
+  },
+  'TP-NARC': {
+    label: 'T. Narcisista de la Personalidad',
+    tag: 'Personalidad Clúster B',
+    questions: [
+      {
+        q: '¿Cuántos criterios del TNP deben cumplirse para el diagnóstico?',
+        opts: ['3 de 9', '5 de 9', '7 de 9', 'Todos los 9'],
+        ans: 1,
+        exp: 'Se requieren ≥5 de los 9 criterios del TNP (DSM-5, 301.81).'
+      },
+      {
+        q: '¿Cuál criterio del TNP describe la incapacidad de reconocer los sentimientos ajenos?',
+        opts: [
+          'Sentido de grandiosidad',
+          'Fantasías de éxito ilimitado',
+          'Falta de empatía: no quiere reconocer o identificarse con los sentimientos y necesidades de los demás',
+          'Comportamiento arrogante y actitudes de suficiencia'
+        ],
+        ans: 2,
+        exp: 'El Criterio 7 del TNP es la falta de empatía: no quiere reconocer o identificarse con los sentimientos y necesidades de los demás.'
+      },
+      {
+        q: 'Un paciente con TNP cree que solo puede ser comprendido por personas especiales o de alto estatus. ¿A qué criterio corresponde?',
+        opts: [
+          'Sentido de grandiosidad (Criterio 1)',
+          'Cree que es "especial" y único (Criterio 3)',
+          'Requiere admiración excesiva (Criterio 4)',
+          'Envidioso de los demás (Criterio 8)'
+        ],
+        ans: 1,
+        exp: 'Criterio 3: cree que es "especial" y único y que solo puede relacionarse con otras personas especiales o de alto estatus (instituciones de alto rango).'
+      }
+    ]
+  },
+  'TP-ANT': {
+    label: 'T. Antisocial de la Personalidad',
+    tag: 'Personalidad Clúster B',
+    questions: [
+      {
+        q: '¿Cuál es el requisito de edad mínima para diagnosticar Trastorno Antisocial de la Personalidad?',
+        opts: ['15 años', '16 años', '18 años', '21 años'],
+        ans: 2,
+        exp: 'El Criterio C exige que la persona sea mayor de 18 años para recibir el diagnóstico de TAP.'
+      },
+      {
+        q: '¿Qué diagnóstico de la infancia debe haberse manifestado antes de los 15 años para cumplir criterios del TAP?',
+        opts: [
+          'TDAH Presentación Combinada',
+          'Trastorno de conducta (Conduct Disorder)',
+          'Trastorno negativista desafiante',
+          'Trastorno de regulación emocional'
+        ],
+        ans: 1,
+        exp: 'Criterio B del TAP: existe evidencia de trastorno de conducta de inicio antes de los 15 años.'
+      },
+      {
+        q: '¿Cuántos criterios de comportamiento antisocial (Criterio A) se requieren para el diagnóstico del TAP?',
+        opts: ['1 de 7', '2 de 7', '3 de 7', '5 de 7'],
+        ans: 2,
+        exp: 'El Criterio A exige ≥3 de los 7 comportamientos antisociales (incumplimiento de normas, engaño, impulsividad, agresividad, despreocupación, irresponsabilidad, falta de remordimiento).'
+      }
+    ]
+  },
+  'TP-OBS': {
+    label: 'T. Obsesivo-Compulsivo de Personalidad',
+    tag: 'Personalidad Clúster C',
+    questions: [
+      {
+        q: '¿Cuántos criterios del TOCP deben cumplirse para el diagnóstico?',
+        opts: ['2 de 8', '4 de 8', '5 de 8', '6 de 8'],
+        ans: 1,
+        exp: 'Se requieren ≥4 de los 8 criterios del TOCP (DSM-5, 301.4). No confundir con TOC (Trastorno Obsesivo-Compulsivo), que no es un trastorno de la personalidad.'
+      },
+      {
+        q: '¿Cuál criterio distingue al TOCP del TOC (Trastorno Obsesivo-Compulsivo)?',
+        opts: [
+          'El TOCP tiene obsesiones y compulsiones egodistónicas',
+          'El TOCP es un patrón de perfeccionismo y rigidez egosintónico sin obsesiones ni compulsiones verdaderas',
+          'El TOC requiere más de 1 hora al día en rituales',
+          'No hay distinción clínica relevante entre ambos'
+        ],
+        ans: 1,
+        exp: 'El TOCP es egosintónico (el paciente no considera su perfeccionismo un problema). El TOC presenta obsesiones/compulsiones egodistónicas que el paciente reconoce como irrazonables.'
+      },
+      {
+        q: 'Un paciente con TOCP no delega tareas porque cree que nadie las hará correctamente. ¿A qué criterio corresponde?',
+        opts: [
+          'Rigidez y obstinación (Criterio 8)',
+          'Incapacidad para delegar tareas si no se someten exactamente a su manera (Criterio 6)',
+          'Perfeccionismo que interfiere con la conclusión de tareas (Criterio 2)',
+          'Dedicación excesiva al trabajo (Criterio 3)'
+        ],
+        ans: 1,
+        exp: 'Criterio 6 del TOCP: delega tareas a otros con reluctancia a menos que se sometan exactamente a su manera de hacer las cosas.'
+      }
+    ]
+  },
+  'TP-PAR': {
+    label: 'T. Paranoide de la Personalidad',
+    tag: 'Personalidad Clúster A',
+    questions: [
+      {
+        q: '¿Cuántos criterios del TPP deben cumplirse para el diagnóstico?',
+        opts: ['2 de 7', '3 de 7', '4 de 7', '5 de 7'],
+        ans: 2,
+        exp: 'Se requieren ≥4 de los 7 criterios del TPP (DSM-5, 301.0).'
+      },
+      {
+        q: '¿Cuál es la diferencia fundamental entre el TPP y el Trastorno Delirante de tipo persecutorio?',
+        opts: [
+          'No hay diferencia diagnóstica',
+          'En el TPP las sospechas no alcanzan el nivel de delirios; en el Trastorno Delirante son delirios estructurados y persistentes',
+          'El TPP requiere alucinaciones auditivas',
+          'El Trastorno Delirante inicia antes de los 18 años'
+        ],
+        ans: 1,
+        exp: 'El TPP implica desconfianza y suspicacia generalizadas que no alcanzan el nivel de delirios (psicóticos). El Trastorno Delirante tiene delirios fijos no bizarros sin otros síntomas psicóticos prominentes.'
+      },
+      {
+        q: 'Un paciente con TPP interpreta halagos neutrales como críticas veladas y gestos amistosos como manipulaciones. ¿A qué criterio corresponde?',
+        opts: [
+          'Sospecha injustificada de que los demás explotan o engañan',
+          'Ideas de referencia y percepción de significados humillantes en comentarios benignos (Criterio D)',
+          'Rencor persistente (Criterio E)',
+          'Percibe ataques a su reputación (Criterio F)'
+        ],
+        ans: 1,
+        exp: 'Criterio D del TPP: ve significados humillantes o amenazantes ocultos en comentarios o gestos benignos.'
+      }
+    ]
+  },
+  'TP-DEP': {
+    label: 'T. Dependiente de la Personalidad',
+    tag: 'Personalidad Clúster C',
+    questions: [
+      {
+        q: '¿Cuántos criterios del TDP deben cumplirse para el diagnóstico?',
+        opts: ['3 de 8', '5 de 8', '6 de 8', 'Todos'],
+        ans: 1,
+        exp: 'Se requieren ≥5 de los 8 criterios del TDP (DSM-5, 301.6).'
+      },
+      {
+        q: 'Un paciente con TDP termina una relación y busca inmediatamente otra fuente de cuidado. ¿A qué criterio corresponde?',
+        opts: [
+          'Dificultad para expresar desacuerdo (Criterio 4)',
+          'Busca urgentemente otra relación cuando termina una, como fuente de cuidado y apoyo (Criterio 7)',
+          'Preocupación por el miedo a ser abandonado (Criterio 8)',
+          'Necesita que otros asuman responsabilidad (Criterio 2)'
+        ],
+        ans: 1,
+        exp: 'Criterio 7 del TDP: busca urgentemente otra relación como fuente de cuidado y apoyo cuando termina una relación íntima.'
+      }
+    ]
+  },
+  'TP-ESQ': {
+    label: 'T. Esquizoide de la Personalidad',
+    tag: 'Personalidad Clúster A',
+    questions: [
+      {
+        q: '¿Cuántos criterios del TEsq deben cumplirse para el diagnóstico?',
+        opts: ['2 de 7', '3 de 7', '4 de 7', '5 de 7'],
+        ans: 2,
+        exp: 'Se requieren ≥4 de los 7 criterios del TEsq (DSM-5, 301.20).'
+      },
+      {
+        q: '¿Cuál es la diferencia entre el Trastorno Esquizoide y el Trastorno Esquizotípico de la Personalidad?',
+        opts: [
+          'El esquizoide tiene delirios; el esquizotípico no',
+          'El esquizotípico tiene cogniciones y percepciones inusuales, pensamiento mágico y excentricidades cognitivas; el esquizoide solo tiene desapego emocional y social',
+          'Son el mismo diagnóstico con diferente nombre',
+          'El esquizoide está en el Clúster B; el esquizotípico en el C'
+        ],
+        ans: 1,
+        exp: 'El Trastorno Esquizotípico añade distorsiones cognitivas/perceptuales (pensamiento mágico, ideas de referencia, ilusiones). El Esquizoide se limita al desapego social y restricción afectiva.'
+      }
+    ]
+  },
+  'TP-HIS': {
+    label: 'T. Histriónico de la Personalidad',
+    tag: 'Personalidad Clúster B',
+    questions: [
+      {
+        q: '¿Cuántos criterios del THP deben cumplirse para el diagnóstico?',
+        opts: ['3 de 8', '5 de 8', '4 de 8', '6 de 8'],
+        ans: 1,
+        exp: 'Se requieren ≥5 de los 8 criterios del THP (DSM-5, 301.50).'
+      },
+      {
+        q: 'Un paciente con THP describe su vida de manera dramática pero con poco detalle. ¿A qué criterio corresponde?',
+        opts: [
+          'Le incomoda no ser el centro de atención (Criterio 1)',
+          'Estilo discursivo impresionista y carente de detalles (Criterio 5)',
+          'Autodramatización y expresión exagerada de emociones (Criterio 6)',
+          'Sugestibilidad (Criterio 7)'
+        ],
+        ans: 1,
+        exp: 'Criterio 5 del THP: tiene un estilo discursivo que impresiona pero carece de detalles.'
+      }
+    ]
+  },
+  'TP-EVI': {
+    label: 'T. Evitativo de la Personalidad',
+    tag: 'Personalidad Clúster C',
+    questions: [
+      {
+        q: '¿Cuántos criterios del TEv deben cumplirse para el diagnóstico?',
+        opts: ['2 de 7', '3 de 7', '4 de 7', '5 de 7'],
+        ans: 2,
+        exp: 'Se requieren ≥4 de los 7 criterios del TEv (DSM-5, 301.82).'
+      },
+      {
+        q: '¿Cuál es la diferencia clave entre el Trastorno Evitativo de la Personalidad y el Trastorno de Ansiedad Social (Fobia Social)?',
+        opts: [
+          'El TEv evita todas las relaciones; la fobia social evita situaciones de actuación específicas',
+          'No hay diferencia, son el mismo diagnóstico',
+          'La fobia social es más grave que el TEv',
+          'El TEv no incluye miedo a la crítica'
+        ],
+        ans: 0,
+        exp: 'El TEv implica un patrón generalizado de evitación e inhibición en múltiples contextos relacionales. La Fobia Social puede ser más circunscrita a situaciones de desempeño público. Aunque coexisten frecuentemente, el TEv requiere el patrón generalizado y de larga data.'
+      }
+    ]
+  }
+};
+
+// ════════════════════════════════════════════
+// CLINICAL CASES
+// ════════════════════════════════════════════
+const CASES = [
+  {
+    id: 'case01',
+    nombre: 'Sebastián, 9 años',
+    categoria: 'Neurodesarrollo',
+    dificultad: 'medium',
+    snippet: 'Niño que no termina tareas, pierde útiles y molesta en clase.',
+    vigneta: 'Sebastián tiene 9 años y cursa cuarto de básica. Su maestra lo describió como "un torbellino": se levanta del asiento constantemente, habla sin que le pregunten e interrumpe a sus compañeros. En casa, su madre reporta que nunca termina la tarea: empieza, se distrae con cualquier ruido y olvida lo que estaba haciendo. Ha perdido tres estuches este trimestre. Cuando se le pide que espere su turno en los juegos, reacciona con frustración y empieza a jugar antes de que le corresponda. Estos comportamientos se observan tanto en casa como en el colegio y en la consulta, y son evidentes desde los 6 años.',
+    entrevista: [
+      'Maestra: "No puede quedarse sentado más de 5 minutos. Grita las respuestas antes de que termine la pregunta."',
+      'Madre: "En casa igual. Empieza cinco cosas y no termina ninguna. El fin de semana también."',
+      'Sebastián: "Me aburro rápido. Se me olvida lo que tenía que hacer."',
+      'Sin antecedentes de trauma, pérdida o ansiedad separatoria reportados.'
+    ],
+    pruebas: [
+      'Escala de Conners para Padres (3ra ed.): Hiperactividad T=78, Inatención T=74 (ambos > 2 DE)',
+      'WISC-V: CI Total 96 (rango normal)',
+      'Escala de Comportamiento Adaptativo Vineland: promedio para la edad',
+      'BRIEF-2 (función ejecutiva): Inhibición T=82, Memoria de Trabajo T=76'
+    ],
+    opciones: [
+      'TDAH Presentación Combinada (F90.2)',
+      'TDAH Presentación Predominantemente Hiperactiva/Impulsiva (F90.1)',
+      'Trastorno de Conducta (F91.9)',
+      'Trastorno Negativista Desafiante (F91.3)',
+      'Discapacidad Intelectual Leve (F70)'
+    ],
+    respuesta: 0,
+    explicacion: 'Sebastián cumple ≥6 síntomas de inatención Y ≥6 de hiperactividad/impulsividad durante >6 meses, en múltiples contextos, con inicio antes de los 12 años y sin otro diagnóstico que explique mejor el cuadro. El CI normal descarta DI. La presentación COMBINADA (F90.2) es la correcta.'
+  },
+  {
+    id: 'case02',
+    nombre: 'Valentina, 7 años',
+    categoria: 'Neurodesarrollo',
+    dificultad: 'hard',
+    snippet: 'Niña que no habla con desconocidos, alinea objetos y gira sobre sí misma.',
+    vigneta: 'Valentina tiene 7 años. Sus padres consultan porque "vive en su mundo". No saluda a familiares que no ve con frecuencia, no responde a su nombre a la primera llamada y rara vez inicia conversación. Cuando habla, lo hace sobre dinosaurios durante horas sin notar si el interlocutor sigue interesado. Alinea sus juguetes por tamaño cada noche; si su madre cambia el orden, Valentina llora durante 30 minutos. Gira sobre sí misma cuando está ansiosa y frota repetidamente su ropa con la manga. Le molestan los sonidos de la licuadora y los lugares con mucha gente, pero no siente dolor cuando se golpea. No tiene amigos de su edad aunque asiste a la escuela regular.',
+    entrevista: [
+      'Madre: "De bebé no extendía los brazos para que la cargara. Pensamos que era tímida."',
+      'Maestra: "En recreo juega sola. Si le hablan, responde brevemente y vuelve a sus cosas."',
+      'Valentina al examinador: "Los dinosaurios carnívoros tienen dientes romos en la parte posterior para cortar."',
+      'No hay regresión del lenguaje reportada. Vocabulario amplio pero comunicación unidireccional.'
+    ],
+    pruebas: [
+      'ADOS-2 (Módulo 2): puntuación total 15 → rango de Autismo',
+      'ADI-R: positivo en los 3 dominios (social, comunicación, comportamientos restringidos)',
+      'Leiter-3 (no verbal): CI 108',
+      'Perfil sensorial de Dunn: hipersensibilidad auditiva marcada, hiposensibilidad propioceptiva'
+    ],
+    opciones: [
+      'Trastorno del Espectro Autista Nivel 1 (F84.0)',
+      'Trastorno del Espectro Autista Nivel 2 (F84.0)',
+      'Trastorno de Ansiedad Social (F40.10)',
+      'Trastorno de la Comunicación Social (F80.89)',
+      'Trastorno Esquizoide de la Personalidad (F60.1)'
+    ],
+    respuesta: 0,
+    explicacion: 'Valentina cumple los 3 criterios A (reciprocidad socioemocional, comunicación no verbal, relaciones) y ≥2 criterios B (estereotipias motoras, insistencia en rutinas, intereses restringidos e hiper/hiposensibilidad sensorial). Con CI normal y lenguaje funcional, el nivel de apoyo es 1. El TCS no incluye comportamientos restringidos. La Fobia Social no explica los patrones sensoriales ni repetitivos.'
+  },
+  {
+    id: 'case03',
+    nombre: 'Marco, 34 años',
+    categoria: 'Ansiedad',
+    dificultad: 'medium',
+    snippet: 'Gerente que no puede dejar de preocuparse y siente tensión muscular constante.',
+    vigneta: 'Marco tiene 34 años, es gerente de proyectos. Consulta porque lleva más de 8 meses sin dormir bien y con tensión en el cuello y hombros permanente. Dice que "siempre está preocupado por algo": el trabajo, la salud de sus padres, las deudas, los accidentes de tráfico. Cuando termina un problema, inmediatamente aparece otro tema de preocupación. Admite que sabe que sus miedos son exagerados, pero no puede controlarlos. Se siente agotado la mayor parte del día aunque no haya dormido mal. Su esposa reporta que está irritable y que "nunca puede relajarse". No hay episodios de pánico ni situaciones sociales específicas evitadas.',
+    entrevista: [
+      'Marco: "Mi mente no para. Cuando me acuesto, empiezo a pensar en todo lo que puede salir mal."',
+      'Esposa: "Antes de cada viaje pasa días angustiado. Cancela planes por miedo a que algo pase."',
+      'No hay consumo de sustancias reportado. TSH normal (descartado hipotiroidismo).',
+      'Sin episodios maníacos o depresivos mayores en historia.'
+    ],
+    pruebas: [
+      'GAD-7: 16/21 (ansiedad severa)',
+      'PHQ-9: 7/27 (depresión leve subclínica)',
+      'Inventario de Preocupación de Penn State (PSWQ): 68/80 (alta preocupación)',
+      'Cortisol matutino: 22 µg/dL (límite superior normal, sin patología endocrina)'
+    ],
+    opciones: [
+      'Trastorno de Ansiedad Generalizada (F41.1)',
+      'Trastorno de Pánico (F41.0)',
+      'Trastorno Depresivo Mayor con síntomas ansiosos (F32.1)',
+      'Trastorno de Ansiedad por Enfermedad (F45.21)',
+      'Trastorno de Adaptación con ansiedad (F43.22)'
+    ],
+    respuesta: 0,
+    explicacion: 'Marco cumple los 6 criterios del TAG: ansiedad excesiva y preocupación difícil de controlar sobre múltiples temas (A), durante >6 meses (A), con ≥3 síntomas somáticos/cognitivos: insomnio, fatiga, irritabilidad, tensión muscular (C), con malestar clínico significativo (D), no explicado por sustancias ni otra condición médica (E, F). No hay ataques de pánico → descarta Trastorno de Pánico.'
+  },
+  {
+    id: 'case04',
+    nombre: 'Diana, 28 años',
+    categoria: 'Trastornos de Personalidad',
+    dificultad: 'hard',
+    snippet: 'Paciente con automutilación, relaciones caóticas y miedo intenso al abandono.',
+    vigneta: 'Diana tiene 28 años. La trae a consulta su pareja después de una crisis de automutilación (cortes superficiales en el antebrazo) luego de una pelea. Diana describe una vida de "altibajos extremos": semanas en que su pareja es "lo mejor que le ha pasado" seguidas de días en que lo odia completamente por pequeños gestos. Ha tenido 6 relaciones en 3 años, todas con rupturas violentas. Tiene tres empleos previos abandonados por conflictos con jefes "injustos". Cuando siente que alguien va a dejarla, puede llamar 40 veces seguidas o amenazar con hacerse daño. Describe sentirse "vacía por dentro" la mayor parte del tiempo. Ha tenido dos intentos de sobredosis en el pasado.',
+    entrevista: [
+      'Diana: "Cuando alguien me abandona siento que me muero. No sé quién soy sin el otro."',
+      'Pareja: "Puede pasar de adorarme a decirme que me odia en minutos. No hay término medio."',
+      'Historia de abuso emocional en la infancia (madre impredecible).',
+      'No hay síntomas psicóticos. Sin euforia o grandiosa sostenida que sugiera Bipolar.'
+    ],
+    pruebas: [
+      'MSI-BPD (Inventario McLean): 8/10 (≥7 = alta probabilidad TLP)',
+      'PAI (Inventario de Evaluación de la Personalidad): escalas BOR elevadas',
+      'PHQ-9: 18 (depresión moderada-severa como estado actual)',
+      'Entrevista estructurada SCID-5-PD: cumple 7/9 criterios TLP'
+    ],
+    opciones: [
+      'Trastorno Límite de la Personalidad (F60.3)',
+      'Trastorno Bipolar I con episodios mixtos (F31.6)',
+      'Trastorno Depresivo Mayor recurrente (F33.1)',
+      'Trastorno Histriónico de la Personalidad (F60.4)',
+      'Trastorno por Estrés Postraumático Complejo'
+    ],
+    respuesta: 0,
+    explicacion: 'Diana cumple 7/9 criterios TLP: (1) esfuerzos desesperados para evitar abandono, (2) relaciones inestables (idealización/devaluación), (3) identidad inestable, (4) impulsividad (abandonos laborales, llamadas compulsivas), (5) comportamiento autolesivo recurrente, (6) inestabilidad afectiva reactiva, (7) sentimientos crónicos de vacío. El Bipolar tiene episodios más sostenidos y no se explica por el miedo al abandono. El THP no incluye automutilación ni identidad difusa.'
+  },
+  {
+    id: 'case05',
+    nombre: 'Andrés, 42 años',
+    categoria: 'Trastornos de Personalidad',
+    dificultad: 'expert',
+    snippet: 'Ejecutivo que "merece más", explota a colegas y nunca admite errores.',
+    vigneta: 'Andrés tiene 42 años, es director financiero. Lo envía RR.HH. tras una queja formal de su equipo. Andrés considera que la queja es "una conspiración de mediocres que no toleran la excelencia". Describe sus logros con gran detalle y menciona que "en su nivel" las reglas comunes no aplican. Espera que sus asistentes estén disponibles los fines de semana sin compensación porque "trabajar con él es un privilegio". Cuando un colega recibe reconocimiento público, Andrés lo minimiza ("tuvo suerte") y pasa días rumiando el agravio. En sesión, habla exclusivamente sobre sí mismo y corrige al terapeuta con frecuencia. No tiene amigos cercanos; sus relaciones son instrumentales.',
+    entrevista: [
+      'Andrés: "Mis subalternos deberían agradecerme. Los he hecho mejores profesionales."',
+      'RR.HH.: "Sus reportes lo evitan. Tres han renunciado en un año por su trato."',
+      'Sin síntomas de humor mayor. Funciona bien laboralmente a pesar de los conflictos.',
+      'Historia: padre muy exitoso que lo comparaba con otros niños constantemente.'
+    ],
+    pruebas: [
+      'NPI-16 (Inventario de Personalidad Narcisista): percentil 95',
+      'PPI-R (Inventario de Personalidad Psicopática): Dominancia egocéntrica elevada; Frialdad emocional moderada',
+      'MCMI-IV: N (Narcisista) = BR 88; 6A (Antisocial) = BR 71',
+      'SCID-5-PD: cumple 6/9 criterios TNP'
+    ],
+    opciones: [
+      'Trastorno Narcisista de la Personalidad (F60.81)',
+      'Trastorno Antisocial de la Personalidad (F60.2)',
+      'Trastorno Obsesivo-Compulsivo de la Personalidad (F60.5)',
+      'Trastorno Histriónico de la Personalidad (F60.4)',
+      'Rasgos narcisistas sin diagnóstico de trastorno'
+    ],
+    respuesta: 0,
+    explicacion: 'Andrés cumple 6/9 criterios TNP: (1) grandiosidad, (2) fantasías de éxito/poder ilimitados, (4) necesita admiración excesiva, (5) sentido de privilegio, (6) explotación interpersonal, (7) falta de empatía, (8) envidia y minimización de logros ajenos. El TAP requiere historial de Trastorno de Conducta antes de los 15 años y criminalidad más explícita. El TOCP se enfoca en perfeccionismo y no en grandiosidad. Con 6 criterios, el umbral (≥5) está claramente superado.'
+  },
+  {
+    id: 'case06',
+    nombre: 'Roberto, 16 años',
+    categoria: 'Neurodesarrollo',
+    dificultad: 'hard',
+    snippet: 'Adolescente con vocabulario de adulto pero con dificultades sociales marcadas y rituales vespertinos.',
+    vigneta: 'Roberto tiene 16 años. Su madre consulta porque aunque es "muy inteligente", "no sabe relacionarse". Tiene un vocabulario extenso y habla sobre física cuántica con facilidad, pero no reconoce cuándo el otro está aburrido. En la escuela, sus compañeros lo evitan porque "no entiende las bromas" y cuando alguien cambia el tema abruptamente, se angustia. Cada tarde realiza la misma secuencia: llegada, lavado de manos (3 veces), merienda siempre en el mismo plato, revisión de apuntes en orden estricto. Si la secuencia se interrumpe, tiene "colapsos" de 20 minutos. Tiene sensibilidad extrema a la textura de la ropa (solo usa algodón) pero no al dolor.',
+    entrevista: [
+      'Roberto: "Las personas cambian de tema sin seguir la lógica. Es irrazonable."',
+      'Madre: "De pequeño usaba palabras de adulto pero no pedía ayuda cuando se caía."',
+      'No hay alucinaciones. Sin historial de episodios de ánimo mayor.',
+      'Rendimiento académico sobresaliente en exactas; reprueba Educación Física por "inflexibilidad".'
+    ],
+    pruebas: [
+      'ADOS-2 Módulo 4: puntuación 12 → rango de Espectro',
+      'WAIS-IV: CI Verbal 134, CI Total 118 (discrepancia V-P significativa)',
+      'AQ-Adolescente (Cociente Autista): 42/50 (umbral clínico ≥32)',
+      'Perfil sensorial: hipersensibilidad táctil severa, procesamiento auditivo normal'
+    ],
+    opciones: [
+      'Trastorno del Espectro Autista Nivel 1 (F84.0)',
+      'Trastorno Obsesivo-Compulsivo (F42.2)',
+      'Trastorno de Ansiedad Social (F40.10)',
+      'Trastorno Esquizotípico de la Personalidad (F21)',
+      'Superdotación intelectual sin trastorno'
+    ],
+    respuesta: 0,
+    explicacion: 'Roberto cumple Criterio A (déficits en reciprocidad socioemocional, en comunicación no verbal, y en relaciones) y Criterio B (insistencia en rutinas con reacción a cambios, intereses altamente restringidos en física, hipersensibilidad sensorial táctil). Con lenguaje funcional y CI alto, el nivel de apoyo es 1. Las rutinas son parte del TEA, no del TOC (no hay insight de que sean irrazonables ni ego-distonía). El diagnóstico de Nivel 1 requiere apoyo social pero no asistencia constante.'
+  }
+];
+
+// ════════════════════════════════════════════
+// APP INIT
+// ════════════════════════════════════════════
+function startApp() {
+  const nombre = document.getElementById('inp-nombre').value.trim();
+  const paralelo = document.getElementById('inp-paralelo').value;
+  if (!nombre || !paralelo) { showToast('Completa todos los campos'); return; }
+  currentStudent = { nombre, paralelo };
+  document.getElementById('identity-screen').style.display = 'none';
+  document.getElementById('app-header').style.display = 'flex';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('student-label').textContent = nombre + ' · ' + paralelo;
+  loadProgress();
+  renderDisorderGrid();
+  renderCasesGrid();
+  renderProgress();
+}
+
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('s-' + id).classList.add('active');
+  event.target.classList.add('active');
+  if (id === 'progreso') renderProgress();
+}
+
+function loadProgress() {
+  try {
+    const saved = localStorage.getItem('psico_mastery_' + currentStudent.nombre);
+    if (saved) mastery = JSON.parse(saved);
+    const savedCases = localStorage.getItem('psico_cases_' + currentStudent.nombre);
+    if (savedCases) caseResults = JSON.parse(savedCases);
+  } catch(e) {}
+}
+function saveProgress() {
+  try {
+    localStorage.setItem('psico_mastery_' + currentStudent.nombre, JSON.stringify(mastery));
+    localStorage.setItem('psico_cases_' + currentStudent.nombre, JSON.stringify(caseResults));
+  } catch(e) {}
+}
+
+// ════════════════════════════════════════════
+// QUIZ SYSTEM
+// ════════════════════════════════════════════
+let currentDisorder = null;
+let questionQueue = [];
+let qIndex = 0;
+let sessionCorrect = 0;
+let sessionTotal = 0;
+let answered = false;
+
+function renderDisorderGrid() {
+  const grid = document.getElementById('disorder-grid');
+  grid.innerHTML = '';
+  Object.entries(DISORDERS).forEach(([key, d]) => {
+    const btn = document.createElement('button');
+    btn.className = 'disorder-btn' + (currentDisorder === key ? ' selected' : '');
+    const m = mastery[key] || 0;
+    btn.innerHTML = d.label + '<span class="tag">' + d.tag + ' · ' + (m >= 3 ? '✓ Dominado' : m + '/3 consec.') + '</span>';
+    btn.onclick = () => selectDisorder(key);
+    grid.appendChild(btn);
+  });
+}
+
+function renderMasteryOverview() {
+  const container = document.getElementById('mastery-overview');
+  container.innerHTML = '';
+  Object.entries(DISORDERS).forEach(([key, d]) => {
+    const m = mastery[key] || 0;
+    const row = document.createElement('div');
+    row.className = 'mastery-row';
+    let dots = '';
+    for (let i = 0; i < 3; i++) {
+      dots += '<div class="dot' + (i < m ? (m >= 3 ? ' gold' : ' filled') : '') + '"></div>';
+    }
+    row.innerHTML = '<div class="mastery-label">' + d.label + '</div><div class="mastery-dots">' + dots + '</div>';
+    container.appendChild(row);
+  });
+}
+
+function selectDisorder(key) {
+  currentDisorder = key;
+  renderDisorderGrid();
+  startQuiz(key);
+}
+
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startQuiz(key) {
+  const d = DISORDERS[key];
+  questionQueue = shuffleArray(d.questions.map((q, i) => ({...q, origIdx: i})));
+  qIndex = 0;
+  sessionCorrect = 0;
+  sessionTotal = questionQueue.length;
+  answered = false;
+
+  document.getElementById('quiz-area').style.display = 'block';
+  document.getElementById('round-result').style.display = 'none';
+  document.getElementById('quiz-disorder-label').textContent = d.label;
+  renderQuestion();
+  renderMasteryOverview();
+}
+
+function renderQuestion() {
+  const q = questionQueue[qIndex];
+  document.getElementById('quiz-question').textContent = q.q;
+  document.getElementById('quiz-progress').textContent = (qIndex + 1) + ' / ' + sessionTotal;
+  document.getElementById('progress-fill').style.width = (qIndex / sessionTotal * 100) + '%';
+  document.getElementById('quiz-feedback').style.display = 'none';
+  document.getElementById('quiz-feedback').className = 'feedback-box';
+  document.getElementById('btn-next').style.display = 'none';
+  answered = false;
+
+  // Shuffle options keeping track of correct answer
+  const opts = q.opts.map((text, i) => ({ text, correct: i === q.ans }));
+  const shuffled = shuffleArray(opts);
+
+  const container = document.getElementById('quiz-options');
+  container.innerHTML = '';
+  shuffled.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.textContent = opt.text;
+    btn.onclick = () => selectOption(btn, opt.correct, q.exp, container);
+    container.appendChild(btn);
+  });
+}
+
+function selectOption(btn, isCorrect, explanation, container) {
+  if (answered) return;
+  answered = true;
+
+  const allBtns = container.querySelectorAll('.option-btn');
+  allBtns.forEach(b => b.disabled = true);
+
+  const feedback = document.getElementById('quiz-feedback');
+  if (isCorrect) {
+    btn.classList.add('correct');
+    sessionCorrect++;
+    mastery[currentDisorder] = (mastery[currentDisorder] || 0) + 1;
+    feedback.className = 'feedback-box correct';
+    feedback.innerHTML = '✓ Correcto. ' + explanation;
+  } else {
+    btn.classList.add('wrong');
+    // Reveal correct
+    allBtns.forEach(b => { if (b.textContent === container.querySelector('.option-btn[disabled]') || true) {} });
+    // Find and highlight correct
+    container.querySelectorAll('.option-btn').forEach(b => {
+      // we need to re-check: mark the btn that wasn't clicked but is correct
+    });
+    mastery[currentDisorder] = 0; // reset consecutive on error
+    feedback.className = 'feedback-box wrong';
+    feedback.innerHTML = '✗ Incorrecto. ' + explanation;
+    // Show correct answer
+    allBtns.forEach(b => { if (!b.classList.contains('wrong')) b.classList.add('reveal'); });
+  }
+  feedback.style.display = 'block';
+  document.getElementById('btn-next').style.display = 'inline-block';
+  saveProgress();
+}
+
+function nextQuestion() {
+  qIndex++;
+  if (qIndex >= sessionTotal) {
+    showRoundResult();
+  } else {
+    renderQuestion();
+  }
+}
+
+function showRoundResult() {
+  document.getElementById('progress-fill').style.width = '100%';
+  const pct = Math.round(sessionCorrect / sessionTotal * 100);
+  document.getElementById('result-score').textContent = pct + '%';
+  document.getElementById('result-sub').textContent = sessionCorrect + ' de ' + sessionTotal + ' correctas';
+
+  const m = mastery[currentDisorder] || 0;
+  let title, msg;
+  if (pct === 100) {
+    title = '¡Dominio perfecto!';
+    msg = 'Respondiste todo correctamente. Los errores rompen la racha — mantén el nivel.';
+  } else if (pct >= 70) {
+    title = 'Buen avance';
+    msg = 'Pero el diagnóstico clínico no perdona el 30%. Repite hasta llegar al 100%.';
+  } else {
+    title = 'Necesitas más práctica';
+    msg = 'Los criterios DSM-5 deben memorizarse con precisión. Vuelve a intentarlo.';
+    mastery[currentDisorder] = 0;
+  }
+  document.getElementById('result-title').textContent = title;
+  document.getElementById('result-msg').textContent = msg;
+  document.getElementById('round-result').style.display = 'block';
+  document.querySelector('.quiz-card').style.display = 'none';
+  renderMasteryOverview();
+  renderDisorderGrid();
+  saveProgress();
+  sendToSheet({ tipo: 'quiz', trastorno: DISORDERS[currentDisorder].label, puntaje: pct, fecha: new Date().toLocaleString('es-EC') });
+}
+
+function restartQuiz() {
+  document.querySelector('.quiz-card').style.display = 'block';
+  startQuiz(currentDisorder);
+}
+
+// ════════════════════════════════════════════
+// CASES
+// ════════════════════════════════════════════
+function renderCasesGrid() {
+  const grid = document.getElementById('cases-grid');
+  grid.innerHTML = '';
+  CASES.forEach(c => {
+    const card = document.createElement('div');
+    card.className = 'case-card' + (caseResults[c.id] ? ' solved' : '');
+    const diffLabel = { medium: 'Intermedio', hard: 'Difícil', expert: 'Experto' }[c.dificultad];
+    const diffClass = { medium: 'diff-medium', hard: 'diff-hard', expert: 'diff-expert' }[c.dificultad];
+    card.innerHTML = `
+      <div class="case-tag">${c.categoria} ${caseResults[c.id] ? '· ✓ Resuelto' : ''}</div>
+      <div class="case-name">${c.nombre}</div>
+      <div class="case-snippet">${c.snippet}</div>
+      <div class="case-difficulty ${diffClass}">${diffLabel}</div>
+    `;
+    card.onclick = () => openCase(c.id);
+    grid.appendChild(card);
+  });
+}
+
+function openCase(id) {
+  const c = CASES.find(x => x.id === id);
+  document.getElementById('cases-list-view').style.display = 'none';
+  document.getElementById('case-detail').style.display = 'block';
+
+  const alreadySolved = caseResults[id];
+
+  const entrevistaHtml = c.entrevista.map(e => `<li>${e}</li>`).join('');
+  const pruebasHtml = c.pruebas.map(p => `<li>${p}</li>`).join('');
+  const optsHtml = c.opciones.map((o, i) => `<div class="diag-opt${alreadySolved && i === c.respuesta ? ' correct' : (alreadySolved && alreadySolved.seleccion === i && i !== c.respuesta ? ' wrong' : '')}" data-idx="${i}">${o}</div>`).join('');
+
+  document.getElementById('case-content').innerHTML = `
+    <div class="section-title">${c.categoria} · ${['', 'Intermedio', '', 'Difícil', '', '', 'Experto'][['medium','hard','expert'].indexOf(c.dificultad)*2]}</div>
+    <div class="section-heading">${c.nombre}</div>
+
+    <h4 style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:8px;">Viñeta clínica</h4>
+    <div class="vignette-box">${c.vigneta}</div>
+
+    <div class="data-grid">
+      <div class="data-box">
+        <h4>Datos de entrevista</h4>
+        <ul>${entrevistaHtml}</ul>
+      </div>
+      <div class="data-box">
+        <h4>Resultados de pruebas psicológicas</h4>
+        <ul>${pruebasHtml}</ul>
+      </div>
+    </div>
+
+    <div class="diagnosis-area">
+      <h3>¿Cuál es el diagnóstico principal según criterios DSM-5?</h3>
+      <div class="diag-options" id="diag-opts">${optsHtml}</div>
+      <div class="justification-area" style="margin-top:16px;">
+        <label>Justificación clínica (menciona los criterios DSM-5 que se cumplen):</label>
+        <textarea id="justification-text" placeholder="Describe qué criterios específicos del DSM-5 cumple este caso..." ${alreadySolved ? 'disabled' : ''}>${alreadySolved ? alreadySolved.justificacion : ''}</textarea>
+      </div>
+      ${alreadySolved ? '' : '<button class="btn-submit-case" onclick="submitCase(\'' + id + '\')">Enviar diagnóstico →</button>'}
+      <div class="case-result-box" id="case-result-box" style="${alreadySolved ? 'display:block;' : ''}${alreadySolved ? (alreadySolved.correcto ? 'background:#e8f8ef;border:1px solid #a3d9b8;' : 'background:#fde8e6;border:1px solid #f5b7b1;') : ''}">
+        ${alreadySolved ? `<h4>${alreadySolved.correcto ? '✓ Diagnóstico correcto' : '✗ Diagnóstico incorrecto'}</h4><p>${c.explicacion}</p>` : ''}
+      </div>
+    </div>
+  `;
+
+  if (!alreadySolved) {
+    document.querySelectorAll('.diag-opt').forEach(el => {
+      el.addEventListener('click', () => {
+        document.querySelectorAll('.diag-opt').forEach(e => e.classList.remove('selected'));
+        el.classList.add('selected');
+      });
+    });
+  }
+}
+
+function submitCase(id) {
+  const c = CASES.find(x => x.id === id);
+  const selected = document.querySelector('.diag-opt.selected');
+  const justText = document.getElementById('justification-text').value.trim();
+  if (!selected) { showToast('Selecciona un diagnóstico'); return; }
+  if (justText.length < 30) { showToast('Escribe una justificación más detallada'); return; }
+
+  const selIdx = parseInt(selected.dataset.idx);
+  const correcto = selIdx === c.respuesta;
+
+  caseResults[id] = { seleccion: selIdx, correcto, justificacion: justText };
+  saveProgress();
+
+  // Mark options
+  document.querySelectorAll('.diag-opt').forEach((el, i) => {
+    el.classList.remove('selected');
+    el.style.pointerEvents = 'none';
+    if (i === c.respuesta) el.classList.add('correct');
+    else if (i === selIdx && !correcto) el.classList.add('wrong');
+  });
+  document.getElementById('justification-text').disabled = true;
+  document.querySelector('.btn-submit-case').style.display = 'none';
+
+  const box = document.getElementById('case-result-box');
+  box.style.display = 'block';
+  box.className = 'case-result-box ' + (correcto ? 'correct' : 'wrong');
+  box.innerHTML = `<h4>${correcto ? '✓ Diagnóstico correcto' : '✗ Diagnóstico incorrecto'}</h4><p>${c.explicacion}</p>`;
+
+  renderCasesGrid();
+  sendToSheet({
+    tipo: 'caso',
+    caso: c.nombre,
+    seleccion: c.opciones[selIdx],
+    correcto: correcto ? 'Sí' : 'No',
+    justificacion: justText,
+    fecha: new Date().toLocaleString('es-EC')
+  });
+}
+
+function backToCases() {
+  document.getElementById('cases-list-view').style.display = 'block';
+  document.getElementById('case-detail').style.display = 'none';
+}
+
+// ════════════════════════════════════════════
+// PROGRESS
+// ════════════════════════════════════════════
+function renderProgress() {
+  const container = document.getElementById('progress-content');
+  const totalDisorders = Object.keys(DISORDERS).length;
+  const dominated = Object.values(mastery).filter(v => v >= 3).length;
+  const totalCases = CASES.length;
+  const solvedCases = Object.keys(caseResults).length;
+  const correctCases = Object.values(caseResults).filter(v => v.correcto).length;
+
+  container.innerHTML = `
+    <div class="progress-section">
+      <h3>Resumen General</h3>
+      <div class="stat-row"><div class="stat-label">Diagnósticos dominados</div><div class="stat-val">${dominated} / ${totalDisorders}</div></div>
+      <div class="stat-row"><div class="stat-label">Casos clínicos resueltos</div><div class="stat-val">${solvedCases} / ${totalCases}</div></div>
+      <div class="stat-row"><div class="stat-label">Diagnósticos correctos en casos</div><div class="stat-val">${correctCases} / ${solvedCases || '—'}</div></div>
+    </div>
+    <div class="progress-section">
+      <h3>Dominio por diagnóstico (3 correctas consecutivas = dominado)</h3>
+      ${Object.entries(DISORDERS).map(([key, d]) => {
+        const m = mastery[key] || 0;
+        return `<div class="stat-row">
+          <div class="stat-label">${d.label}</div>
+          <div class="stat-val" style="color:${m >= 3 ? 'var(--green)' : 'var(--navy)'}">${m >= 3 ? '✓ Dominado' : m + '/3'}</div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="progress-section">
+      <h3>Casos resueltos</h3>
+      ${CASES.map(c => {
+        const r = caseResults[c.id];
+        return `<div class="stat-row">
+          <div class="stat-label">${c.nombre}</div>
+          <div class="stat-val" style="color:${!r ? 'var(--muted)' : r.correcto ? 'var(--green)' : 'var(--red)'}">${!r ? 'Pendiente' : r.correcto ? '✓ Correcto' : '✗ Incorrecto'}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+}
+
+// ════════════════════════════════════════════
+// GOOGLE SHEETS
+// ════════════════════════════════════════════
+async function sendToSheet(data) {
+  if (!SHEET_URL || SHEET_URL === 'TU_URL_GOOGLE_APPS_SCRIPT_AQUI') return;
+  try {
+    await fetch(SHEET_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...data, nombre: currentStudent.nombre, paralelo: currentStudent.paralelo })
+    });
+  } catch(e) {}
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
